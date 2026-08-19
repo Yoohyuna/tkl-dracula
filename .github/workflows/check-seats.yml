@@ -12,6 +12,8 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
     timeout-minutes: 10
     steps:
       - name: Stop once the show date has passed
@@ -29,7 +31,11 @@ jobs:
         if: steps.gate.outputs.expired == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow disable check-seats.yml
+        run: |
+          curl -sS -X PUT \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/check-seats.yml/disable"
 
       - uses: actions/checkout@v4
         if: steps.gate.outputs.expired != 'true'
@@ -43,18 +49,6 @@ jobs:
       - name: Install dependencies
         if: steps.gate.outputs.expired != 'true'
         run: npm ci
-
-      - name: Cache Playwright browsers
-        if: steps.gate.outputs.expired != 'true'
-        uses: actions/cache@v4
-        id: pw-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Install Playwright browser
-        if: steps.gate.outputs.expired != 'true'
-        run: npx playwright install --with-deps chromium
 
       - name: Check seats
         if: steps.gate.outputs.expired != 'true'
