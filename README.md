@@ -18,3 +18,8 @@
 ## 수동 실행
 
 GitHub 저장소의 Actions 탭 → "Ticketlink Dracula Seat Check" → "Run workflow" 로 바로 테스트할 수 있습니다.
+
+## 종료 시점
+
+공연일(2026.10.10) 이후에는 실행 시작 시 워크플로우가 스스로를 비활성화(disable)합니다.
+그 전까지는 5분마다 계속 실행됩니다.

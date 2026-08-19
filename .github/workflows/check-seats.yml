@@ -5,22 +5,47 @@ on:
     - cron: '*/5 * * * *'
   workflow_dispatch: {}
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Stop once the show date has passed
+        id: gate
+        run: |
+          today=$(TZ=Asia/Seoul date +%Y-%m-%d)
+          echo "today (KST): $today"
+          if [[ "$today" > "2026-10-10" ]]; then
+            echo "expired=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "expired=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Disable this workflow (past show date)
+        if: steps.gate.outputs.expired == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow disable check-seats.yml
+
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.expired != 'true'
 
       - uses: actions/setup-node@v4
+        if: steps.gate.outputs.expired != 'true'
         with:
           node-version: 20
           cache: npm
 
       - name: Install dependencies
+        if: steps.gate.outputs.expired != 'true'
         run: npm ci
 
       - name: Cache Playwright browsers
+        if: steps.gate.outputs.expired != 'true'
         uses: actions/cache@v4
         id: pw-cache
         with:
@@ -28,7 +53,9 @@ jobs:
           key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright browser
+        if: steps.gate.outputs.expired != 'true'
         run: npx playwright install --with-deps chromium
 
       - name: Check seats
+        if: steps.gate.outputs.expired != 'true'
         run: node scripts/check_seats.js
