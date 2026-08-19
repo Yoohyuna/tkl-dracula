@@ -1,0 +1,24 @@
+{
+  "name": "tkl-dracula",
+  "version": "1.0.0",
+  "description": "뮤지컬 <드라큘라> 2026.10.10(토) 19:00 회차의 OP석/VIP석 예매 가능 여부를 5분마다 확인해서, 좌석이 생기면 [ntfy.sh](https://ntfy.sh) 푸시 알림을 보내는 GitHub Actions 워크플로우입니다.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yoohyuna/tkl-dracula.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Yoohyuna/tkl-dracula/issues"
+  },
+  "homepage": "https://github.com/Yoohyuna/tkl-dracula#readme",
+  "dependencies": {
+    "playwright": "1.62.1"
+  }
+}
